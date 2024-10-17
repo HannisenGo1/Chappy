@@ -1,0 +1,50 @@
+body{
+  background-color: rgb(172, 172, 255);
+}
+
+div.header {
+  background-color: rgb(172, 172, 255);
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  position: fixed; 
+  top: 0; 
+  left: 0;
+  width: 100%; 
+
+}
+
+h1{
+text-align: center;
+color: rgb(5, 5, 4);
+font-family: 'Times New Roman', Times, serif;
+}
+#loginbtn{
+  background-color: #8a2be2;
+  margin-left: auto;
+  padding:0.7em;
+  font-weight: bold;
+  cursor:pointer;
+  margin-top: 1em;
+}
+
+#loginbtn :active{
+background-color: blue;
+ }
+
+#signupbtn {
+  background-color: blueviolet;
+  padding:0.7em;
+  font-weight: bold;
+  cursor:pointer;
+  margin-left: 0.4em;
+  margin-right: 1em;
+  margin-top: 1em;
+}
+
+#userContainer{
+  display: flex;
+  height: 10em;
+  width: 10em;
+}
+
