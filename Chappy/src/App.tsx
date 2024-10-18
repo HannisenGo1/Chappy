@@ -1,20 +1,12 @@
-// import { useState } from 'react'
+import Channels from './components/channels'; 
 
-import './App.css'
+const App = () => {
+    return (
+        <div>
+            <h1>CHAPPY</h1>
+            <Channels />
+        </div>
+    );
+};
 
-function App() {
-  
-  
-  return (
- 
-    <div> 
-
-    </div>
- 
-
-   
-    
-  )
-}
-
-export default App
+export default App;

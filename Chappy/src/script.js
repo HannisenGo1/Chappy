@@ -33,7 +33,7 @@ export async function getUser() {
     try {
         const response = await fetch('/api/users');
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`HTTP error! ${response.status}`);
         }
 
         const userData = await response.json(); 

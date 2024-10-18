@@ -37,12 +37,13 @@ app.get('/', async (_, res) => {
 });
 
 //http://localhost:5000/kanaler
-app.get('/kanaler', async (_, res) => {
+app.get('/kanaler', async (req, res) => {
     try {
         const [collection, client] = await connect();
-        const kanaler = await collection.find({}).toArray(); 
+        const category = req.query.category; 
+        const kanaler = await collection.find(category ? { topic: category } : {}).toArray();
         res.status(200).json(kanaler);
-        await client.close(); 
+        await client.close();
     } catch (error) {
         console.error("Fel vid hämtning av kanaler:", error);
         res.status(500).send("Något gick fel vid hämtning av kanaler.");

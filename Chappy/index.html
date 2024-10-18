@@ -1,28 +1,37 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chappy App</title>
     <link rel="stylesheet" href="index.css"> 
+</head>
+<body>
+    <header>
+        <div class="header"> 
+            <button id="loginbtn"> Logga in </button>
+            <button id="signupbtn"> Skapa konto </button>
+        </div>
+    </header>
+
+    <main>
+        <h1>CHAPPY</h1>
+        <button id="datan">Hämta Användare</button>
+        <div id="userContainer"></div>
+        
+        
+        <div id="channelroomContainer"></div>
+        
+     
+        <div id="root"></div>
+    </main>
+    
+    
     <script type="module" src="/src/main.tsx"></script>
     <script type="module" src="/src/script.js"></script>
 
-        <div id="root"></div>
-  </head>
-
-  <header>
-<div class="header"> 
-  <button id="loginbtn"> Logga in </button>
-  <button id="signupbtn"> Skapa konto </button>
-</div>
-    </header>
-  <body>
-    
-    <h1>CHAPPY</h1>
-    <button id="datan">Hämta Användare</button>
-    <div id="userContainer"></div>
-    
-  </body>
+</body>
 </html>
+
+
