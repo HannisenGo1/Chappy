@@ -1,14 +1,17 @@
 import express from "express";
-import { getAllUsers } from "../database/mongodb.js";
-export const router = express.Router();
+import { getUser } from "../database/mongodb.js";
+//import { WithId } from "mongodb";
+//import { user } from "../models/users.js";
+const router = express.Router();
 // GET x2, POST, PUT, DELETE
-router.get('/user', async (_, res) => {
+router.get('/', async (_, res) => {
     try {
-        const allUsers = await getAllUsers();
-        res.json(allUsers);
+        const users = await getUser();
+        res.json(users);
     }
     catch (error) {
-        console.error("Error fetching users:", error);
-        res.status(500).json;
+        console.error('Error fetching users:', error);
+        res.status(500).json({ message: 'Failed to fetch users' });
     }
 });
+export { router };

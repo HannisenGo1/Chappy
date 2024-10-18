@@ -28,31 +28,33 @@ loginbtn.addEventListener('click', async () => {
 
 document.getElementById('datan').addEventListener('click', getUser);
 
-async function getUser() {
+export async function getUser() {
+
     try {
-        const response = await fetch('/api/users', { method: 'GET' }); 
+        const response = await fetch('/api/users');
         if (!response.ok) {
-            console.error("Failed:", response.status);
-            return;
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
-        const userData = await response.json();
+
+        const userData = await response.json(); 
         console.log('Svar från servern: ', userData);
 
-        const productDiv = document.getElementById('userContainer');
-        productDiv.innerHTML = ''; 
+        const userDiv = document.getElementById('userContainer');
+        userDiv.innerHTML = ''; 
 
         userData.forEach(user => {
-            const userDiv = document.createElement('div');
-            userDiv.classList.add('userinfo');
+            const userElement = document.createElement('div');
+            userElement.classList.add('userinfo');
 
             const userName = document.createElement('h2');
             userName.innerText = user.name;
 
-            userDiv.appendChild(userName);
-            productDiv.appendChild(userDiv);
+            userElement.appendChild(userName);
+            userDiv.appendChild(userElement);
         });
     } catch (error) {
-        console.error("Error fetching the user:", error);
+        console.error('Error fetching users:', error);
     }
 }
+
+

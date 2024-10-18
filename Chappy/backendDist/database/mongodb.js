@@ -1,43 +1,26 @@
-import { MongoClient } from 'mongodb';
-export async function connectToDatabase() {
-    const connectionString = process.env.CONNECTION_STRING;
-    if (!connectionString) {
-        throw new Error("Connection string is not defined. Please set CONNECTION_STRING in .env file.");
+import { MongoClient, ObjectId } from 'mongodb';
+const con = process.env.CONNECTION_STRING;
+async function connect() {
+    if (!con) {
+        console.log('No connection string, check your .env file!');
+        throw new Error('No connection string');
     }
-    const client = new MongoClient(connectionString);
-    try {
-        await client.connect();
-        console.log("Successfully connected to MongoDB!");
-        const database = client.db("Chappy");
-        const collection = database.collection("chappy");
-        return { client, collection };
-    }
-    catch (error) {
-        console.error("Failed to connect to MongoDB", error);
-        throw error;
-    }
+    const client = await MongoClient.connect(con);
+    const db = await client.db('chappy');
+    const col = db.collection('user');
+    return [col, client];
 }
-//hämta alla användare från databasen
-export async function getAllUsers() {
-    let x;
-    try {
-        x = await connectToDatabase(); // Anslut till databasen
-        // Hämta alla dokument från samlingen
-        const cursor = x.collection.find({});
-        const found = await cursor.toArray();
-        console.log("Found users:", found); // Logga vad som hittades
-        if (found.length < 1) {
-            console.log("No users available today :/");
-        }
-        return found;
-    }
-    catch (error) {
-        console.error('Error fetching users', error);
-        throw error;
-    }
-    finally {
-        if (x) {
-            await x.client.close();
-        }
-    }
+async function getUser() {
+    const [col, client] = await connect();
+    const result = await col.find({}).toArray();
+    await client.close();
+    return result;
 }
+async function updateUser(id, newUser) {
+    // TODO: ändra returtyp till något mera passande
+    const [col, client] = await connect();
+    const result = await col.updateOne({ _id: new ObjectId(id) }, { $set: newUser });
+    await client.close();
+    return result;
+}
+export { getUser, updateUser, connect };

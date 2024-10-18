@@ -4,15 +4,19 @@
 	  "lib": ["ES2023"],
 	  "module": "ESNext",
 	  "skipLibCheck": true,
-	  "moduleResolution": "node",  
+
+	  /* Bundler mode */
+	  "moduleResolution": "bundler",
 	  "isolatedModules": true,
+	  "moduleDetection": "force",
 	  "noEmit": false,
-	  "outDir": "./backendDist",
-	  "strict": false,
+	  "outDir": "./backendDist/",
+
+	  /* Linting */
+	  "strict": true,
 	  "noUnusedLocals": true,
 	  "noUnusedParameters": true,
-	  "noFallthroughCasesInSwitch": true,
-	  "allowSyntheticDefaultImports": true 
+	  "noFallthroughCasesInSwitch": true
 	},
 	"include": ["backendSrc/**/*"]
   }

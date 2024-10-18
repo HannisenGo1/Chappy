@@ -5,7 +5,7 @@ import { user } from '../models/users.js';
 async function connectToDatabase(): Promise<{ client: MongoClient; collection: Collection<user> }> {
     const connectionString: string | undefined = process.env.CONNECTION_STRING;
     if (!connectionString) {
-        throw new Error("Connection string is not defined in environment variables.");
+        throw new Error("Connection string is not defined.");
     }
 
     const client = new MongoClient(connectionString);
