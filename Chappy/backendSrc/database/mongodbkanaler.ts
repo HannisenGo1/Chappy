@@ -1,7 +1,7 @@
 import { MongoClient, Collection } from "mongodb";
 import { Channel } from "../models/kanaler"; 
 
-// Funktion för att koppla till databasen
+
 export async function connect(): Promise<[Collection<Channel>, MongoClient]> {
     const connectionString: string | undefined = process.env.CONNECTION_STRING;
 
