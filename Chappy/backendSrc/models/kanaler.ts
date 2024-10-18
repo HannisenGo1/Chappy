@@ -1,0 +1,17 @@
+export interface User {
+    username: string;
+}
+
+export interface Message {
+    user: User;
+    content: string;
+}
+
+export interface Channel {
+    name: string;
+    description: string;
+    topic: string;
+    users: User[];
+    isOpen: boolean; 
+    messages: Message[]; 
+}

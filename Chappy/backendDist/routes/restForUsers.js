@@ -1,7 +1,5 @@
 import express from "express";
 import { getUser } from "../database/mongodb.js";
-//import { WithId } from "mongodb";
-//import { user } from "../models/users.js";
 const router = express.Router();
 // GET x2, POST, PUT, DELETE
 router.get('/', async (_, res) => {

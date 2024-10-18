@@ -17,7 +17,6 @@ async function getUser() {
     return result;
 }
 async function updateUser(id, newUser) {
-    // TODO: ändra returtyp till något mera passande
     const [col, client] = await connect();
     const result = await col.updateOne({ _id: new ObjectId(id) }, { $set: newUser });
     await client.close();

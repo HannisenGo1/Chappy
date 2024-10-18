@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 async function connectToDatabase() {
     const connectionString = process.env.CONNECTION_STRING;
     if (!connectionString) {
-        throw new Error("Connection string is not defined in environment variables.");
+        throw new Error("Connection string is not defined.");
     }
     const client = new MongoClient(connectionString);
     try {
