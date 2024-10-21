@@ -1,7 +1,11 @@
-import express, { Express, NextFunction, Request} from 'express';
+import express, { Express, NextFunction, Request, Response} from 'express';
 import {router as userRouter} from './routes/restForUsers.js'
-import { saveChatMessages, chatMessages } from './database/mongodbChat.js';
+import {router as chatRouter} from './routes/restForChats.js'
 import {saveChannels, channels, connect} from './database/mongodbkanaler.js'
+import jwt from 'jsonwebtoken'
+import {validateLogin} from './users/validateLogin.js'
+
+const { sign } = jwt
 
 const port: number = Number(process.env.PORT || 3000);
 const app: Express = express();
@@ -22,9 +26,7 @@ app.get('/', (_, res) => {
     res.send('Welcome to the server!');
 });
 
-app.get('/', async () => {
-    await saveChatMessages(chatMessages);
-});
+
 
 app.get('/', async (_, res) => {
     try {
@@ -50,8 +52,32 @@ app.get('/kanaler', async (req, res) => {
     }
 });
 
+app.use('/api/chats', chatRouter);
 app.use('/api/users', userRouter);
 // http://localhost:5000/api/user
+
+app.post('/login', (req: Request, res: Response) => {
+	if( !process.env.SECRET ) {
+		res.sendStatus(500)
+		return
+	}
+	console.log('Body är: ', req.body)
+	const userId = validateLogin(req.body.username, req.body.password)
+	console.log('user id: ', userId)
+	if( !userId ) {
+		res.status(401).send({
+			"error": "Unauthorized",
+			"message": "You are not authorized to access"
+		})
+		return
+	}
+
+	const payload = {
+		userId
+	}
+	const token: string = sign(payload, process.env.SECRET)
+	res.send({ jwt: token })
+})
 
 
 // Starta servern

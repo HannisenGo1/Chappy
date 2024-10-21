@@ -1,8 +1,9 @@
 import { MongoClient, ObjectId } from 'mongodb';
 const con = process.env.CONNECTION_STRING;
+// ansluter till mongodb collection 
 async function connect() {
     if (!con) {
-        console.log('No connection string, check your .env file!');
+        console.log('check the .env file!');
         throw new Error('No connection string');
     }
     const client = await MongoClient.connect(con);
@@ -16,10 +17,25 @@ async function getUser() {
     await client.close();
     return result;
 }
-async function updateUser(id, newUser) {
+// Få ut användare baserat på namn, använder i validateLogin för inloggningen.
+async function getUserByname(username) {
     const [col, client] = await connect();
-    const result = await col.updateOne({ _id: new ObjectId(id) }, { $set: newUser });
+    const user = await col.findOne({ username });
+    await client.close();
+    return user;
+}
+// Skapa en ny användare
+async function createUser(newUser) {
+    const [col, client] = await connect();
+    const result = await col.insertOne(newUser);
     await client.close();
     return result;
 }
-export { getUser, updateUser, connect };
+// Radera befintlig användare
+async function deleteUser(id) {
+    const [col, client] = await connect();
+    const result = await col.deleteOne({ _id: new ObjectId(id) });
+    await client.close();
+    return result;
+}
+export { getUser, connect, getUserByname, createUser, deleteUser };

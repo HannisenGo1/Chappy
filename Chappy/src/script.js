@@ -1,6 +1,6 @@
 const LS_KEY = 'JWT-DEMO--TOKEN';
 const loginbtn = document.querySelector('#loginbtn');
-const signupbtn = document.querySelector('#signupbtn');
+// const signupbtn = document.querySelector('#signupbtn');
 const resultattext = document.getElementById('resultattext'); 
 
 loginbtn.addEventListener('click', async () => {

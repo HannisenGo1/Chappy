@@ -1,5 +1,4 @@
 import { MongoClient } from "mongodb";
-// Funktion för att koppla till databasen
 export async function connect() {
     const connectionString = process.env.CONNECTION_STRING;
     if (!connectionString) {

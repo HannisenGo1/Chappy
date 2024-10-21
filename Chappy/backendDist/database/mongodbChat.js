@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
-// koppla till MongoDB
-async function connect() {
+// Funktion för att koppla till MongoDB
+export async function connect() {
     const connectionString = process.env.CONNECTION_STRING;
     if (!connectionString) {
         throw new Error("Connection string is not defined in environment variables.");
@@ -11,7 +11,7 @@ async function connect() {
     const collection = database.collection("chats");
     return [collection, client];
 }
-// Spara chat meddelanden i databasen
+// Funktion för att spara nya chattmeddelanden
 export async function saveChatMessages(messages) {
     const [collection, client] = await connect();
     try {
@@ -25,7 +25,22 @@ export async function saveChatMessages(messages) {
         await client.close();
     }
 }
-export const chatMessages = [
+// Kontrollera om meddelandet redan finns
+async function chatMessageExists(message) {
+    const [collection, client] = await connect();
+    try {
+        const existingMessage = await collection.findOne({
+            sender: message.sender,
+            receiver: message.receiver,
+            message: message.message
+        });
+        return existingMessage !== null;
+    }
+    finally {
+        await client.close();
+    }
+}
+const messages = [
     {
         sender: "Robin",
         receiver: "Lars",
@@ -67,4 +82,10 @@ export const chatMessages = [
         message: "Låter bra! Vi ses då.",
     }
 ];
-saveChatMessages(chatMessages);
+// Kontrollera varje meddelande innan vi lägger till det
+for (const message of messages) {
+    const exists = await chatMessageExists(message);
+    if (!exists) {
+        await saveChatMessages([message]);
+    }
+}
