@@ -1,6 +1,9 @@
 import express from "express";
-import { getUser, createUser, deleteUser } from "../database/mongodb.js";
-import { validateLogin } from '../users/validateLogin.js';
+import { getUser, createUser, deleteUser, connect } from "../database/mongodb.js";
+//import {validateLogin} from '../users/validateLogin.js'
+import { ObjectId } from "mongodb";
+//import  jwt  from "jsonwebtoken";
+// const { sign } = jwt;
 const router = express.Router();
 router.get('/', async (_, res) => {
     try {
@@ -10,22 +13,6 @@ router.get('/', async (_, res) => {
     catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).json({ message: 'Failed to fetch users' });
-    }
-});
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const userId = await validateLogin(username, password);
-        if (userId) {
-            res.status(200).json({ userId, message: "Login successful" });
-        }
-        else {
-            res.status(401).json({ message: "Invalid username or password" });
-        }
-    }
-    catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).json({ message: 'Login failed' });
     }
 });
 //skapa användaren genom api/users/create
@@ -55,6 +42,25 @@ router.delete('/:id', async (req, res) => {
     catch (error) {
         console.error('Error deleting user:', error);
         res.status(500).json({ message: 'Failed to delete user' });
+    }
+});
+// I din userRouter eller en ny router
+router.get('/api/users/:id', async (req, res) => {
+    const userId = req.params.id;
+    try {
+        const [collection, client] = await connect();
+        const user = await collection.findOne({ _id: new ObjectId(userId) });
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            await client.close();
+            return;
+        }
+        await client.close();
+        res.status(200).json({ name: user.name, id: user._id });
+    }
+    catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ message: 'Failed to fetch user data' });
     }
 });
 export { router };

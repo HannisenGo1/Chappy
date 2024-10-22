@@ -18,9 +18,9 @@ async function getUser() {
     return result;
 }
 // Få ut användare baserat på namn, använder i validateLogin för inloggningen.
-async function getUserByname(username) {
+async function getUserByname(name) {
     const [col, client] = await connect();
-    const user = await col.findOne({ username });
+    const user = await col.findOne({ name });
     await client.close();
     return user;
 }

@@ -1,32 +1,27 @@
 import express from 'express';
 import { router as userRouter } from './routes/restForUsers.js';
 import { router as chatRouter } from './routes/restForChats.js';
-import { saveChannels, channels, connect } from './database/mongodbkanaler.js';
+import { connect } from './database/mongodbkanaler.js';
 import jwt from 'jsonwebtoken';
 import { validateLogin } from './users/validateLogin.js';
-const { sign } = jwt;
+const { sign, verify } = jwt;
+import cors from 'cors';
+import { getUserByname } from './database/mongodb.js';
 const port = Number(process.env.PORT || 3000);
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
+app.use('/', express.json());
 app.use('/', (req, _, next) => {
     console.log(`${req.method} ${req.url}`, req.body);
     next();
 });
-app.use(express.static('./public'));
-app.get('/', (_, res) => {
-    res.send('Welcome to the server!');
-});
-app.get('/', async (_, res) => {
-    try {
-        await saveChannels(channels);
-        res.status(200).send("Kanaler har sparats!");
-    }
-    catch (error) {
-        console.error("Fel vid sparande av kanaler:", error);
-        res.status(500).send("Något gick fel vid sparande av kanaler.");
-    }
-});
-//http://localhost:5000/kanaler
+app.use('/', express.static('./src'));
+// Hämta kanaler
 app.get('/kanaler', async (req, res) => {
     try {
         const [collection, client] = await connect();
@@ -40,17 +35,18 @@ app.get('/kanaler', async (req, res) => {
         res.status(500).send("Något gick fel vid hämtning av kanaler.");
     }
 });
+// Routes! 
 app.use('/api/chats', chatRouter);
 app.use('/api/users', userRouter);
-// http://localhost:5000/api/user
-app.post('/login', (req, res) => {
+// Inloggning
+app.post('/login', async (req, res) => {
     if (!process.env.SECRET) {
         res.sendStatus(500);
         return;
     }
     console.log('Body är: ', req.body);
-    const userId = validateLogin(req.body.username, req.body.password);
-    console.log('user id: ', userId);
+    const userId = await validateLogin(req.body.name, req.body.password);
+    console.log('user id i login: ', userId);
     if (!userId) {
         res.status(401).send({
             "error": "Unauthorized",
@@ -58,11 +54,37 @@ app.post('/login', (req, res) => {
         });
         return;
     }
-    const payload = {
-        userId
-    };
+    const payload = { userId };
     const token = sign(payload, process.env.SECRET);
     res.send({ jwt: token });
+});
+app.get('/protected', (req, res) => {
+    if (!process.env.SECRET) {
+        res.sendStatus(500);
+        return;
+    }
+    let token = req.headers.authorization;
+    console.log('Header', token);
+    if (!token) {
+        res.sendStatus(401);
+        return;
+    }
+    let payload;
+    try {
+        // const paycode som Payload
+        payload = verify(token, process.env.SECRET);
+        console.log('Payload', payload);
+    }
+    catch (error) {
+        res.sendStatus(400);
+        return;
+    }
+    let userId = payload.userId;
+    const user = getUserByname(userId);
+    if (!user) {
+        res.sendStatus(404);
+        return;
+    }
 });
 // Starta servern
 app.listen(port, () => {

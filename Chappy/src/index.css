@@ -1,9 +1,9 @@
 body{
-  background-color: rgb(172, 172, 255);
+  background-color: rgb(175, 175, 175);
 }
 
 div.header {
-  background-color: rgb(172, 172, 255);
+  background-color: #C383FF;;
   display: flex;
   flex-direction: row;
   align-items: center; 
@@ -20,7 +20,7 @@ color: rgb(5, 5, 4);
 font-family: 'Times New Roman', Times, serif;
 }
 #loginbtn{
-  background-color: #8a2be2;
+  background-color: #C383FF;
   margin-left: auto;
   padding:0.7em;
   font-weight: bold;
@@ -33,13 +33,16 @@ background-color: blue;
  }
 
 #signupbtn {
-  background-color: blueviolet;
+  background-color: #C383FF;
   padding:0.7em;
   font-weight: bold;
   cursor:pointer;
   margin-left: 0.4em;
   margin-right: 1em;
   margin-top: 1em;
+}
+#signupbtn :hover{
+  background-color: blueviolet;
 }
 
 #userContainer{
@@ -51,8 +54,8 @@ background-color: blue;
 
 h1 {
   margin: 20px 0;
-  font-size: 24px;
-  color: #333;
+  font-size: 2.4em;
+  color: #ffffff;
   text-align: center;
 }
 
@@ -61,21 +64,20 @@ button {
   padding: 10px 15px;
   font-size: 16px;
   cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  border: none;
+  background-color: #C383FF;
+  border: 2px black;
   border-radius: 5px;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #9049d1;
 }
 #channelroomContainer {
   display: flex; 
   flex-direction: column;
   padding: 20px; 
   width: 300px; 
-  background-color: #f9f9f9; 
+  background-color: #C383FF; 
   border: 1px solid #ddd; 
 }
 
@@ -84,7 +86,7 @@ button:hover {
   padding: 10px; 
   border: 1px solid #ccc; 
   border-radius: 5px; 
-  background-color: #fff; 
+
 }
 
 h2{
