@@ -7,8 +7,8 @@ export interface User {
 }
 
 // validera inloggning mot servern
-async function validateLogin(username: string, password: string): Promise<UserId | null> {
-    const data = { username, password };
+async function validateLogin(name: string, password: string): Promise<UserId | null> {
+    const data = { name, password };
     
     try {
         const response = await fetch('/login', {
@@ -32,7 +32,7 @@ async function validateLogin(username: string, password: string): Promise<UserId
     }
 }
 
-// Funktion för att hämta användardata från servern med ID
+// hämta användardata från servern med ID
 async function getUserData(userId: UserId): Promise<User | null> {
     try {
         const response = await fetch(`/api/users/${userId}`, {

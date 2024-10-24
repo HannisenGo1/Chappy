@@ -1,12 +1,13 @@
 import Channels from './components/channels'; 
-//import { TheChats } from './components/Chats';  <TheChats /> 
+import Chats from './components/Chats';
+ 
 
 const App = () => {
     return (
         <div>
             <h1>CHAPPY</h1>
             <Channels />
-           
+           <Chats />
         </div>
     );
 };

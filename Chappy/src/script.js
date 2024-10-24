@@ -3,6 +3,7 @@ const loginbtn = document.querySelector('#loginbtn');
 // const signupbtn = document.querySelector('#signupbtn');
 const resultattext = document.getElementById('resultattext'); 
 import {useStore} from './storage/storage.js' 
+import {validateLogin} from './components/users'
 
 loginbtn.addEventListener('click', async () => {
     const username = document.querySelector('#username').value;
@@ -26,7 +27,7 @@ loginbtn.addEventListener('click', async () => {
         const result = await response.json();
         const token = result.jwt; 
         
-        // Använd Zustand store för att spara token
+        // Zustand store för att spara token
         const setJwt = useStore.getState().setJwt;
         setJwt(token);
         
@@ -38,7 +39,23 @@ loginbtn.addEventListener('click', async () => {
         console.error('Error:', error);
     }
 });
+const handleLogin = async () => {
+    const username = document.querySelector('#username').value;
+    const password = document.querySelector('#password').value;
 
+    const userId = await validateLogin(username, password);
+    
+    if (userId) {
+        console.log('Inloggad med ID:', userId);
+ 
+        useStore.getState().setUserId(userId); 
+        const userData = await getUserData(userId);
+        console.log('Användardata:', userData);
+    } else {
+        console.log('Inloggning misslyckades.');
+    }
+};
+handleLogin();
 
 // Hämta token från Zustand store
 async function fetchProtectedData() {
@@ -62,6 +79,7 @@ async function fetchProtectedData() {
             const data = await response.json();
             console.log('Hämtade chattar:', data);
             return data; 
+            
         } else {
             resultattext.innerText = 'Åtkomst nekad eller ogiltig token';
         }
@@ -71,10 +89,10 @@ async function fetchProtectedData() {
     }
 }
 
-
-
-
 document.getElementById('datan').addEventListener('click', getUser);
+
+
+
 
 export async function getUser() {
     const token = useStore.getState().jwt; 

@@ -14,7 +14,7 @@ export const useStore = create((set) => ({
         set({ jwt: null });
         localStorage.removeItem('jwt'); 
     },
-
+    setUserId: (id) => set({ userId: id }),
 }));
 
 

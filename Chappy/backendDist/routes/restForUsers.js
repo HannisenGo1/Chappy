@@ -1,9 +1,6 @@
 import express from "express";
 import { getUser, createUser, deleteUser, connect } from "../database/mongodb.js";
-//import {validateLogin} from '../users/validateLogin.js'
 import { ObjectId } from "mongodb";
-//import  jwt  from "jsonwebtoken";
-// const { sign } = jwt;
 const router = express.Router();
 router.get('/', async (_, res) => {
     try {
@@ -44,7 +41,6 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ message: 'Failed to delete user' });
     }
 });
-// I din userRouter eller en ny router
 router.get('/api/users/:id', async (req, res) => {
     const userId = req.params.id;
     try {

@@ -1,9 +1,9 @@
 import express from 'express';
 import { router as userRouter } from './routes/restForUsers.js';
 import { router as chatRouter } from './routes/restForChats.js';
-import { connect } from './database/mongodbkanaler.js';
+import { router as kanalRouter } from './routes/restForChannels.js';
 import jwt from 'jsonwebtoken';
-import { validateLogin } from './users/validateLogin.js';
+import { validateLogin } from './validate/validateLogin.js';
 const { sign, verify } = jwt;
 import cors from 'cors';
 import { getUserByname } from './database/mongodb.js';
@@ -14,39 +14,26 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
 app.use('/', express.json());
 app.use('/', (req, _, next) => {
     console.log(`${req.method} ${req.url}`, req.body);
     next();
 });
 app.use('/', express.static('./src'));
-// Hämta kanaler
-app.get('/kanaler', async (req, res) => {
-    try {
-        const [collection, client] = await connect();
-        const category = req.query.category;
-        const kanaler = await collection.find(category ? { topic: category } : {}).toArray();
-        res.status(200).json(kanaler);
-        await client.close();
-    }
-    catch (error) {
-        console.error("Fel vid hämtning av kanaler:", error);
-        res.status(500).send("Något gick fel vid hämtning av kanaler.");
-    }
-});
 // Routes! 
 app.use('/api/chats', chatRouter);
 app.use('/api/users', userRouter);
+app.use('/kanaler', kanalRouter);
 // Inloggning
 app.post('/login', async (req, res) => {
     if (!process.env.SECRET) {
+        console.error('SECRET not defined');
         res.sendStatus(500);
         return;
     }
     console.log('Body är: ', req.body);
     const userId = await validateLogin(req.body.name, req.body.password);
-    console.log('user id i login: ', userId);
+    console.log('User id i login: ', userId);
     if (!userId) {
         res.status(401).send({
             "error": "Unauthorized",
@@ -71,7 +58,6 @@ app.get('/protected', (req, res) => {
     }
     let payload;
     try {
-        // const paycode som Payload
         payload = verify(token, process.env.SECRET);
         console.log('Payload', payload);
     }
@@ -85,6 +71,7 @@ app.get('/protected', (req, res) => {
         res.sendStatus(404);
         return;
     }
+    res.json({ message: 'Protected data accessed', userId });
 });
 // Starta servern
 app.listen(port, () => {

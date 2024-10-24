@@ -1,10 +1,11 @@
 import express, { Router, Response, Request } from "express"; 
 import { getUser , createUser, deleteUser, connect} from "../database/mongodb.js";
-//import {validateLogin} from '../users/validateLogin.js'
-import { ObjectId } from "mongodb";
-//import  jwt  from "jsonwebtoken";
-// const { sign } = jwt;
 
+import { ObjectId } from "mongodb";
+
+ 
+
+ export type UserId = string
 
 const router: Router = express.Router()
 
@@ -17,7 +18,6 @@ router.get('/', async (_, res: Response) => {
         res.status(500).json({ message: 'Failed to fetch users' });
     }
 });
-
 
 
 //skapa användaren genom api/users/create
@@ -51,7 +51,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     }
 });
 
-// I din userRouter eller en ny router
+
 router.get('/api/users/:id', async (req: Request, res: Response) => {
     const userId = req.params.id;
 
@@ -72,6 +72,8 @@ router.get('/api/users/:id', async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Failed to fetch user data' });
     }
 });
+
+
 
 
 export  {router}

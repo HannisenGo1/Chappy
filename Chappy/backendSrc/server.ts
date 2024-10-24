@@ -1,9 +1,9 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { router as userRouter } from './routes/restForUsers.js';
 import { router as chatRouter } from './routes/restForChats.js';
-import { connect } from './database/mongodbkanaler.js';
+import { router as kanalRouter } from './routes/restForChannels.js';
 import jwt from 'jsonwebtoken';
-import { validateLogin } from './users/validateLogin.js';
+import { validateLogin } from './validate/validateLogin.js';
 const { sign , verify} = jwt;
 import cors from 'cors';
 import { getUserByname } from './database/mongodb.js';
@@ -25,7 +25,7 @@ interface Payload {
 }
 
 
-app.use(express.json());
+
 app.use('/', express.json()) 
 
 app.use('/', (req: Request, _, next: NextFunction) => {
@@ -35,34 +35,22 @@ app.use('/', (req: Request, _, next: NextFunction) => {
 
 app.use('/', express.static('./src')); 
 
-// Hämta kanaler
-app.get('/kanaler', async (req, res) => {
-    try {
-        const [collection, client] = await connect();
-        const category = req.query.category; 
-        const kanaler = await collection.find(category ? { topic: category } : {}).toArray();
-        res.status(200).json(kanaler);
-        await client.close();
-    } catch (error) {
-        console.error("Fel vid hämtning av kanaler:", error);
-        res.status(500).send("Något gick fel vid hämtning av kanaler.");
-    }
-});
 
 // Routes! 
 app.use('/api/chats', chatRouter);
 app.use('/api/users', userRouter);
-
+app.use('/kanaler', kanalRouter);
 // Inloggning
 app.post('/login', async (req: Request, res: Response) => {
     if (!process.env.SECRET) {
+        console.error('SECRET not defined');
         res.sendStatus(500);
         return;
     }
     
-    console.log('Body är: ', req.body);
-    const userId = await validateLogin(req.body.name, req.body.password);
-    console.log('user id i login: ', userId);
+    console.log('Body är: ', req.body); 
+    const userId = await validateLogin(req.body.name, req.body.password); 
+    console.log('User id i login: ', userId);
     
     if (!userId) {
         res.status(401).send({
@@ -91,7 +79,7 @@ app.get('/protected', (req: Request, res: Response) => {
     }
     let payload: Payload
     try {
-        // const paycode som Payload
+   
         payload = verify(token, process.env.SECRET) as Payload;
         console.log('Payload', payload)
     } catch (error) {
@@ -104,6 +92,7 @@ app.get('/protected', (req: Request, res: Response) => {
         res.sendStatus(404)
         return
     }
+    res.json({ message: 'Protected data accessed', userId });
 });
 
 
