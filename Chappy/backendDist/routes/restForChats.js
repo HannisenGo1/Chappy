@@ -16,11 +16,11 @@ router.get('/', async (_, res) => {
     }
 });
 // Skapa en ny chattmeddelande
+// Spara det nya meddelandet
 router.post('/', async (req, res) => {
     const newMessage = req.body;
     try {
         const [collection, client] = await connect();
-        // Spara det nya meddelandet
         await collection.insertOne(newMessage);
         res.status(201).json({ message: "Chat message created" });
         await client.close();

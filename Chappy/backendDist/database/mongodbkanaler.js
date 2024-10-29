@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+// kopplas med databasen
 export async function connect() {
     const connectionString = process.env.CONNECTION_STRING;
     if (!connectionString) {
@@ -6,17 +7,23 @@ export async function connect() {
     }
     const client = new MongoClient(connectionString);
     await client.connect();
-    const database = client.db("chappy");
-    const collection = database.collection("kanaler");
+    const db = client.db("chappy");
+    const collection = db.collection("kanaler");
     return [collection, client];
 }
-// Funktion för att infoga ett nytt meddelande i en kanal
+export async function getChannels() {
+    const [col, client] = await connect();
+    const result = await col.find({}).toArray();
+    await client.close();
+    return result;
+}
+// infoga nytt meddelande i en kanal
+// uppdatera dokumentet med det ämnet och lägg till meddelandet
+// Returnera true om meddelandet lades till
 export async function insertMessage(topic, message) {
     const [collection, client] = await connect();
     try {
-        // Försök att uppdatera dokumentet med det angivna ämnet och lägg till meddelandet
         const result = await collection.updateOne({ topic }, { $push: { messages: message } });
-        // Returnera true om meddelandet lades till
         return result.modifiedCount > 0;
     }
     catch (error) {
@@ -26,6 +33,13 @@ export async function insertMessage(topic, message) {
     finally {
         await client.close();
     }
+}
+// Skapa en ny kanal
+export async function createChannel(newchannel) {
+    const [col, client] = await connect();
+    const result = await col.insertOne(newchannel);
+    await client.close();
+    return result;
 }
 // Funktion för att spara kanaler i databasen
 export async function saveChannels(channels) {
@@ -42,7 +56,7 @@ export async function saveChannels(channels) {
         await client.close();
     }
 }
-// Definiera kanaler med användare och meddelanden
+// kanaler med användare och meddelanden
 const channels = [
     {
         name: "#Frontend",
