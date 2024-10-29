@@ -10,39 +10,38 @@
 <body>
     <header>
         <div class="header"> 
-            <button id="loginbtn"> Logga in </button>
-            <button id="signupbtn"> Skapa konto </button>
+            <button id="loginbtn">Logga in</button>
+            <button id="logoutbtn" style="display:none;">Logga ut</button> 
+            <button id="signupbtn">Skapa konto</button>
+            <button id="deleteAccountBtn" style="display:none;">Radera konto</button> 
         </div>
     </header>
     <div id="loginFormContainer">
         <h2>Logga in</h2>
-        <div>
+        
+        <div id="labelforLogin">
             <label for="username">Användarnamn:</label>
             <input type="text" id="username" placeholder="Ange användarnamn">
-        </div>
-        <div>
             <label for="password">Lösenord:</label>
             <input type="password" id="password" placeholder="Ange lösenord">
         </div>
-      
+        
         <p id="resultattext"></p>
     </div>
-
+    
     <main>
-  
+
         <button id="datan">Hämta Användare</button>
         <div id="userContainer"></div>
-        <button id="datachat">Hämta chatt</button>
-       
         
-     
+        
         <div id="root"></div>
     </main>
     
     
     <script type="module" src="/src/main.tsx"></script>
     <script type="module" src="/src/script.js"></script>
-
+    
     
 </body>
 </html>

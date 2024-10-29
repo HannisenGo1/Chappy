@@ -1,7 +1,7 @@
 import { MongoClient, Collection } from "mongodb";
-import { Channel } from "../models/kanaler"; 
+import { Channel, Message } from "../models/kanaler"; 
 
-
+// kopplas med databasen
 export async function connect(): Promise<[Collection<Channel>, MongoClient]> {
     const connectionString: string | undefined = process.env.CONNECTION_STRING;
 
@@ -12,9 +12,29 @@ export async function connect(): Promise<[Collection<Channel>, MongoClient]> {
     const client = new MongoClient(connectionString);
     await client.connect();
     const database = client.db("chappy");
-    const collection = database.collection<Channel>("kanaler"); 
+    const collection = database.collection<Channel>("kanaler");
 
     return [collection, client];
+}
+
+// infoga nytt meddelande i en kanal
+export async function insertMessage(topic: string, message: Message): Promise<boolean> {
+    const [collection, client] = await connect(); 
+
+    try {
+ // uppdatera dokumentet med det ämnet och lägg till meddelandet
+        const result = await collection.updateOne(
+            { topic }, 
+            { $push: { messages: message } }
+        );
+// Returnera true om meddelandet lades till
+        return result.modifiedCount > 0; 
+    } catch (error) {
+        console.error('Error inserting message:', error);
+        return false; 
+    } finally {
+        await client.close(); 
+    }
 }
 
 // Funktion för att spara kanaler i databasen
@@ -32,8 +52,9 @@ export async function saveChannels(channels: Channel[]): Promise<void> {
     }
 }
 
-// Definiera kanaler med användare och meddelanden
-export const channels: Channel[] = [
+
+// kanaler med användare och meddelanden
+const channels: Channel[] = [
     {
         name: "#Frontend",
         description: "Diskussioner om frontend-teknologier som HTML, CSS och JavaScript.",

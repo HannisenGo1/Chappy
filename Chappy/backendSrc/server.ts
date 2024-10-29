@@ -36,6 +36,7 @@ app.use('/', (req: Request, _, next: NextFunction) => {
 app.use('/', express.static('./src')); 
 
 
+
 // Routes! 
 app.use('/api/chats', chatRouter);
 app.use('/api/users', userRouter);

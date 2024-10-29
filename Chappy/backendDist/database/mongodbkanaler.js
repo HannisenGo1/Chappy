@@ -10,6 +10,23 @@ export async function connect() {
     const collection = database.collection("kanaler");
     return [collection, client];
 }
+// Funktion för att infoga ett nytt meddelande i en kanal
+export async function insertMessage(topic, message) {
+    const [collection, client] = await connect();
+    try {
+        // Försök att uppdatera dokumentet med det angivna ämnet och lägg till meddelandet
+        const result = await collection.updateOne({ topic }, { $push: { messages: message } });
+        // Returnera true om meddelandet lades till
+        return result.modifiedCount > 0;
+    }
+    catch (error) {
+        console.error('Error inserting message:', error);
+        return false;
+    }
+    finally {
+        await client.close();
+    }
+}
 // Funktion för att spara kanaler i databasen
 export async function saveChannels(channels) {
     const [collection, client] = await connect();
@@ -26,7 +43,7 @@ export async function saveChannels(channels) {
     }
 }
 // Definiera kanaler med användare och meddelanden
-export const channels = [
+const channels = [
     {
         name: "#Frontend",
         description: "Diskussioner om frontend-teknologier som HTML, CSS och JavaScript.",

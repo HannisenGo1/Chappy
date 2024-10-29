@@ -1,8 +1,8 @@
-export interface User {
+export  interface User {
     username: string;
 }
 
-export interface Message {
+ export interface Message {
     user: User;
     content: string;
 }
@@ -14,4 +14,13 @@ export interface Channel {
     users: User[];
     isOpen: boolean; 
     messages: Message[]; 
+}
+export interface SendMessage {
+    topic: string;
+    message: {
+        user: {
+            username: string;
+        };
+        content: string;
+    };
 }

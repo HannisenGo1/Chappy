@@ -3,9 +3,6 @@ import { connect } from "../database/mongodbChat.js";
 import { ObjectId } from "mongodb";
 const router: Router = express.Router();
 
-
-
-
 // Hämta alla chattmeddelanden
 router.get('/', async (_, res: Response) => {
     try {
@@ -20,12 +17,13 @@ router.get('/', async (_, res: Response) => {
 });
 
 // Skapa en ny chattmeddelande
+// Spara det nya meddelandet
 router.post('/', async (req: Request, res: Response) => {
     const newMessage = req.body;
-
+    
     try {
         const [collection, client] = await connect();
-        // Spara det nya meddelandet
+        
         await collection.insertOne(newMessage); 
         res.status(201).json({ message: "Chat message created" });
         await client.close(); 
@@ -38,7 +36,7 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.delete('/:id', async (req: Request, res: Response) => {
     const messageId = req.params.id;
-
+    
     try {
         const [collection, client] = await connect();
         const result = await collection.deleteOne({ _id: new ObjectId(messageId) }); 
