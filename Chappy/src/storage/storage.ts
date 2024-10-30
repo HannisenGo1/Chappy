@@ -8,6 +8,7 @@ interface StoreState {
     userId: string | null;
     setUserId: (id: string) => void;
     isLoggedIn: () => boolean;
+    
 }
 
 // Initiera jwt från localStorage om den finns
@@ -36,8 +37,10 @@ export const useStore = create<StoreState>((set) => ({
     userId: null,
     setUserId: (id: string) => set({ userId: id }), 
 
-// returnerar true om om LocalS. innehåller jwt token.
-    isLoggedIn: () => !!localStorage.getItem('jwt'), 
+// returnerar true om LocalS. innehåller jwt token.
+isLoggedIn: () => {
+    return !!localStorage.getItem('jwt'); 
+},
 }));
 
 interface Store {

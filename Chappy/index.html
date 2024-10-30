@@ -7,7 +7,7 @@
     <title>Chappy App</title>
     <link rel="stylesheet" href="index.css"> 
 </head>
-<body>
+<body>    <main>
     <header>
         <div class="header"> 
             <button id="loginbtn">Logga in</button>
@@ -24,16 +24,17 @@
             <input type="text" id="username" placeholder="Ange användarnamn">
             <label for="password">Lösenord:</label>
             <input type="password" id="password" placeholder="Ange lösenord">
+            <p id="resultattext"></p>
         </div>
         
-        <p id="resultattext"></p>
+     
     </div>
-    
-    <main>
+      
+        <div id="userContainer"></div>
+        <p id="resultattext2" style="display: none;"></p> 
+
 
         <button id="datan">Hämta Användare</button>
-        <div id="userContainer"></div>
-        
         
         <div id="root"></div>
     </main>

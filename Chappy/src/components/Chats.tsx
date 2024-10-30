@@ -1,19 +1,30 @@
 import { useEffect, useState } from 'react';
+import { useStore } from '../storage/storage';
 
 interface Chat {
-  sender: string;
-  receiver: string;
-  message: string;
+    sender: string;
+    receiver: string;
+    message: string;
 }
 
-const Chats = () => {
+export const Chats = () => {
     const [chats, setChats] = useState<Chat[]>([]);
-    const [filter, setFilter] = useState<string>(''); 
+    const [filter] = useState<string>(''); 
+    const { jwt } = useStore(); 
 
     useEffect(() => {
         const fetchChats = async () => {
+            if (!jwt) return; 
+            
             try {
-                const response = await fetch('/api/chats');
+                const response = await fetch('/api/chats', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${jwt}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! ${response.status}`);
                 }
@@ -26,9 +37,7 @@ const Chats = () => {
         };
 
         fetchChats();
-    }, []);
-
-
+    }, [jwt]); 
 
     const filteredChats = filter
         ? chats.filter(chat =>
@@ -42,16 +51,15 @@ const Chats = () => {
         <div id="chatContainer">
             <h2>Chattar</h2>
             
-                <ul>
-                    {filteredChats.map((chat, index) => (
-                        <li key={index}>
-                            <strong>Avsändare:</strong> {chat.sender} <br />
-                            <strong>Mottagare:</strong> {chat.receiver} <br />
-                            <strong>Meddelande:</strong> {chat.message}
-                        </li>
-                    ))}
-                </ul>
-            
+            <ul>
+                {filteredChats.map((chat, index) => (
+                    <li key={index}>
+                        <strong>Avsändare:</strong> {chat.sender} <br />
+                        <strong>Mottagare:</strong> {chat.receiver} <br />
+                        <strong>Meddelande:</strong> {chat.message}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };

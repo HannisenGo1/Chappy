@@ -40,11 +40,9 @@ app.post('/login', async (req: Request, res: Response) => {
         res.sendStatus(500);
         return;
     }
-    
-    console.log('Body är: ', req.body); 
-    const userId = await validateLogin(req.body.name, req.body.password); 
-    console.log('User id i login: ', userId);
-    
+
+    const userId = await validateLogin(req.body.name, req.body.password);
+
     if (!userId) {
         res.status(401).send({
             "error": "Unauthorized",
@@ -52,11 +50,12 @@ app.post('/login', async (req: Request, res: Response) => {
         });
         return;
     }
-    
-    const payload = { userId };
+
+    const payload = { userId, name: req.body.name }; 
     const token: string = sign(payload, process.env.SECRET);
-    res.send({ jwt: token });
+    res.send({ jwt: token, name: req.body.name });
 });
+
 
 app.get('/protected', (req: Request, res: Response) => {
     if (!process.env.SECRET) {

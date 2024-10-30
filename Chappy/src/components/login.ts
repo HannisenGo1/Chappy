@@ -1,28 +1,36 @@
 import { useStore } from "../storage/storage";
 
-const LS_KEY = 'JWT-DEMO--TOKEN';
+//const LS_KEY = 'JWT-DEMO--TOKEN';
 const resultattext = document.getElementById('resultattext') as HTMLParagraphElement | null;
+const resultattext2 = document.getElementById('resultattext2') as HTMLParagraphElement | null; // Rätt referens här
 const loginFormContainer = document.getElementById('loginFormContainer') as HTMLDivElement | null;
 const loginButton = document.getElementById('loginbtn') as HTMLButtonElement | null;
 
-let formVisible = false; 
+let formVisible = false;
+
+interface LoginResponse {
+    jwt: string;
+    name: string; 
+}
 
 export const handleLogin = async (): Promise<void> => {
     const username = (document.querySelector('#username') as HTMLInputElement)?.value;
     const password = (document.querySelector('#password') as HTMLInputElement)?.value;
-    
+
     if (!username || !password) {
         if (resultattext) {
             resultattext.innerText = 'Användarnamn och lösenord måste anges';
         }
         return;
     }
+
     interface LoginData {
         name: string;
         password: string;
     }
+
     const data: LoginData = { name: username, password };
-    
+
     try {
         const response = await fetch('/login', {
             method: 'POST',
@@ -31,32 +39,30 @@ export const handleLogin = async (): Promise<void> => {
             },
             body: JSON.stringify(data)
         });
-        
+
+        console.log('Response status:', response.status); 
         if (response.status !== 200) {
             if (resultattext) {
                 resultattext.innerText = 'Inloggning misslyckades, försök igen';
             }
             return;
         }
-        
-        interface LoginResponse {
-            jwt: string;
-        }
+
         const result: LoginResponse = await response.json();
-        const token = result.jwt;
-        
-        // Spara token i localStorage och Zustand store
-        useStore.getState().setJwt(token);
-        localStorage.setItem(LS_KEY, token);
-        if ( username || password) {
-          if (resultattext) {   
-         resultattext.innerText = 'Du är nu inloggad';   
+
+        if (resultattext2) {
+            resultattext2.style.display = 'block'; 
+            resultattext2.innerText = `Välkommen ${result.name}!`;
+        } else {
+            console.error('resultattext2 element not found');
         }
-       
+
+        if (loginFormContainer) {
+            loginFormContainer.style.display = 'none'; 
         }
-        
-        // kontrollerar behörigheten 
-        await fetchProtectedData(token);
+
+        // Kontrollerar behörigheten 
+        await fetchProtectedData(result.jwt);
     } catch (error) {
         if (resultattext) {
             resultattext.innerText = 'Ett fel uppstod vid inloggningen';
@@ -65,26 +71,25 @@ export const handleLogin = async (): Promise<void> => {
     }
 };
 
-
 export const toggleLoginForm = (): void => {
-    formVisible = !formVisible; 
-    
+    formVisible = !formVisible;
+
     if (loginFormContainer) {
         loginFormContainer.style.display = formVisible ? 'block' : 'none';
     }
-    
-    
-    if (!formVisible) {
-        handleLogin();
-    }
 };
 
-
 if (loginButton) {
-    loginButton.addEventListener('click', toggleLoginForm);
+    loginButton.addEventListener('click', async () => {
+        if (!formVisible) {
+            toggleLoginForm();
+        } else {
+            await handleLogin();
+        }
+    });
 }
 
-//  skyddade data med JWT-token
+// Fetch skyddade data med JWT-token
 export const fetchProtectedData = async (token: string): Promise<void> => {
     if (!token) {
         console.error('Ingen token hittades, användaren kanske inte är inloggad.');
@@ -112,7 +117,7 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
 };
 
 
-// kollar om den som ska logga in har ett giltigt token. 
+// Fetch user data använder JWT token
 export const getUser = async (): Promise<void> => {
     const token = useStore.getState().jwt;
     
