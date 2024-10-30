@@ -1,19 +1,7 @@
 import { useEffect, useState } from 'react';
 import openIcon from '../img/open.png';
 import closedIcon from '../img/closed.png';
-
-// Kanaldatatyper 
-export interface Channel {
-  name: string;
-  description: string;
-  topic: string; 
-  users: any[];
-  isOpen: boolean;
-  messages: {
-    user: { username: string };
-    content: string;
-  }[];
-}
+import {  SendMessage,Channel,Message   } from './interfaces/InterfaceChannel';
 
 export const PublicChannels = () => {
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -23,9 +11,10 @@ export const PublicChannels = () => {
     'Allmän diskussion': true,
     'Nyhetsdiskussioner': false,
   });
-  const [openChannels, setOpenChannels] = useState<{ [key: string]: boolean }>({});
-  const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null); // Ny state för vald kanal
+  const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>(''); 
+  const [newMessage, setNewMessage] = useState<string>(''); 
 
   useEffect(() => {
     const fetchChannels = async () => {
@@ -36,6 +25,7 @@ export const PublicChannels = () => {
         }
 
         const channelData: Channel[] = await response.json();
+        console.log('Hämtade kanaler:', channelData);
         setChannels(channelData);
       } catch (error) {
         console.error('Fel vid hämtning av kanaler:', error);
@@ -47,19 +37,64 @@ export const PublicChannels = () => {
 
   const handleCategoryClick = (categoryName: string) => {
     if (!openCategories[categoryName]) {
-      setMessage('Du måste logga in för att öppna denna kanalen');
+      setMessage('Du måste logga in för att öppna kanalen');
       return;
     }
-    setMessage(null); 
+    setMessage(null);
+
+    const categoryChannel = channels.find(channel => channel.topic === categoryName);
+    if (categoryChannel) {
+      setSelectedChannel(categoryChannel);
+    } else {
+      setMessage('Ingen kanal tillgänglig i denna kategori');
+    }
   };
 
-  const handleChannelClick = (channelName: string) => {
-    const channel = channels.find(c => c.name === channelName);
-    setSelectedChannel(channel || null); 
-    setOpenChannels(prevState => ({
-      ...prevState,
-      [channelName]: !prevState[channelName],
-    }));
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedChannel || !username.trim()) {
+      setMessage('Både namn och meddelande måste fyllas i');
+      return;
+    }
+
+    const messagePayload: SendMessage = {
+      topic: selectedChannel.topic,
+      message: {
+        user: { username },
+        content: newMessage,
+      },
+    };
+
+    try {
+      const response = await fetch('/kanaler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(messagePayload),
+      });
+
+      if (response.ok) {
+        const addedMessage: Message = {
+          user: { username },
+          content: newMessage,
+        };
+
+        setSelectedChannel(prevChannel => {
+          const updatedChannel = prevChannel as Channel; 
+          return {
+            ...updatedChannel,
+            messages: [...updatedChannel.messages, addedMessage],
+          };
+        });
+        setNewMessage('');
+      } else {
+        const errorData = await response.json();
+        setMessage(errorData.message || 'Något gick fel vid sändning av meddelande');
+      }
+    } catch (error) {
+      console.error('Fel vid sändning av meddelande', error);
+      setMessage('Kunde inte skicka meddelande. Försök igen senare.');
+    }
   };
 
   return (
@@ -68,7 +103,10 @@ export const PublicChannels = () => {
         {message && <p style={{ color: 'orange' }}>{message}</p>}
         {Object.keys(openCategories).map((categoryName) => (
           <div key={categoryName}>
-            <h2 style={{ cursor: openCategories[categoryName] ? 'pointer' : 'default' }} onClick={() => handleCategoryClick(categoryName)}>
+            <h2
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleCategoryClick(categoryName)}
+            >
               {categoryName}
               <img
                 src={openCategories[categoryName] ? openIcon : closedIcon}
@@ -76,25 +114,32 @@ export const PublicChannels = () => {
                 style={{ marginLeft: '10px', width: '30px', height: '30px' }}
               />
             </h2>
-            {openCategories[categoryName] && (
-              <div id="openchannelcontainer">
-                {channels
-                  .filter(channel => channel.topic === categoryName) 
-                  .map((channel, index) => (
-                    <div key={index}>
-                      <h3 style={{ cursor: 'pointer' }} onClick={() => handleChannelClick(channel.name)}>
-                        {channel.name}
-                      </h3>
-                    </div>
-                  ))}
-              </div>
-            )}
           </div>
         ))}
       </div>
 
       <div>
-        {selectedChannel && <ChannelInfo channel={selectedChannel} />}
+        {selectedChannel && (
+          <>
+            <ChannelInfo channel={selectedChannel} />
+
+            <div className="sendMessageForm">
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Ange ditt namn..."
+              />
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Skriv ditt meddelande här..."
+              />
+              <button onClick={handleSendMessage}>Skicka</button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -103,7 +148,7 @@ export const PublicChannels = () => {
 const ChannelInfo = ({ channel }: { channel: Channel }) => {
   return (
     <div className="channelsinfo">
-      <h3>{channel.name}</h3> 
+      <h3>{channel.name}</h3>
       <p>{channel.description}</p>
       <div>
         {channel.messages.length > 0

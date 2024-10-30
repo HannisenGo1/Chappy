@@ -5,7 +5,7 @@ import { router as kanalRouter } from './routes/restForChannels.js';
 import jwt from 'jsonwebtoken';
 import { validateLogin } from './validate/validateLogin.js';
 const { sign , verify} = jwt;
-import cors from 'cors';
+
 import { getUserByname } from './database/mongodb.js';
 
 export type UserId = string
@@ -14,17 +14,10 @@ const port: number = Number(process.env.PORT || 3000);
 const app: Express = express();
 
 
-app.use(cors({
-    origin: 'http://localhost:5173', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
-    allowedHeaders: ['Content-Type', 'Authorization'] 
-}));
 interface Payload {
     userId: string;
     iat: number;
 }
-
-
 
 app.use('/', express.json()) 
 
@@ -34,7 +27,6 @@ app.use('/', (req: Request, _, next: NextFunction) => {
 });
 
 app.use('/', express.static('./src')); 
-
 
 
 // Routes! 

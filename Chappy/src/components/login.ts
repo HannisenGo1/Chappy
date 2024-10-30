@@ -48,12 +48,14 @@ export const handleLogin = async (): Promise<void> => {
         // Spara token i localStorage och Zustand store
         useStore.getState().setJwt(token);
         localStorage.setItem(LS_KEY, token);
-        
-        if (resultattext) {
-            resultattext.innerText = 'Du är nu inloggad';
+        if ( username || password) {
+          if (resultattext) {   
+         resultattext.innerText = 'Du är nu inloggad';   
+        }
+       
         }
         
-        // Efter inloggning
+        // kontrollerar behörigheten 
         await fetchProtectedData(token);
     } catch (error) {
         if (resultattext) {
@@ -82,7 +84,7 @@ if (loginButton) {
     loginButton.addEventListener('click', toggleLoginForm);
 }
 
-// Fetch skyddade data med JWT-token
+//  skyddade data med JWT-token
 export const fetchProtectedData = async (token: string): Promise<void> => {
     if (!token) {
         console.error('Ingen token hittades, användaren kanske inte är inloggad.');
@@ -110,7 +112,7 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
 };
 
 
-// Fetch user data använder JWT token
+// kollar om den som ska logga in har ett giltigt token. 
 export const getUser = async (): Promise<void> => {
     const token = useStore.getState().jwt;
     

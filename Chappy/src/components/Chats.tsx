@@ -30,7 +30,6 @@ const Chats = () => {
 
 
 
-    // Filtrera chattmeddelanden baserat på filtersträngen
     const filteredChats = filter
         ? chats.filter(chat =>
             chat.sender.toLowerCase().includes(filter.toLowerCase()) ||

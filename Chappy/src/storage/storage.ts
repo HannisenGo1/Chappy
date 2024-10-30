@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-//  interface för tillståndet
+//  interface för tillstånden
 interface StoreState {
     jwt: string | null;
     setJwt: (token: string) => void;
@@ -10,18 +10,22 @@ interface StoreState {
     isLoggedIn: () => boolean;
 }
 
-// Skapa Zustand-store med type state
 // Initiera jwt från localStorage om den finns
-//  sätta JWT-token och spara till localStorage
+// sätta JWT-token och spara till localStorage
 // Uppdatera Zustand-tillståndet -> spara token.
 export const useStore = create<StoreState>((set) => ({
     
+//kontrollera om det finns en giltig jwt token och sätter jwtvärdet, annars null 
+// sätter jwt till nytt token och sparar i localStorage så att användaren förblir inloggad =)
+// tar bort jwt så att man blir utloggad 
     jwt: localStorage.getItem('jwt') || null,
+    
     
     setJwt: (token: string) => {
         set({ jwt: token });             
         localStorage.setItem('jwt', token); 
     },
+    
     
     clearJwt: () => {
         set({ jwt: null });            
@@ -31,8 +35,11 @@ export const useStore = create<StoreState>((set) => ({
     
     userId: null,
     setUserId: (id: string) => set({ userId: id }), 
+
+// returnerar true om om LocalS. innehåller jwt token.
     isLoggedIn: () => !!localStorage.getItem('jwt'), 
 }));
+
 interface Store {
     isLoggedIn: boolean;
     setLoggedIn: (value: boolean) => void;

@@ -49,6 +49,9 @@ div.header {
   height: 10em;
   width: 10em;
 }
+.sendMessageForm{
+  display:flex;
+}
 
 h1 {
   margin: 20px 0;

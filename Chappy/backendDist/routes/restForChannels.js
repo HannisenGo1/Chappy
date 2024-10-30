@@ -6,11 +6,11 @@ const router = express.Router();
 router.get('/', async (_, res) => {
     try {
         const channels = await getChannels();
-        res.json(channels);
+        res.status(200).json(channels);
     }
     catch (error) {
         console.error("Error fetching channels:", error);
-        res.status(500).send("Failed to fetch channels.");
+        res.status(500).json({ message: "Failed to fetch channels." });
     }
 });
 // användaren kan skriva in ett meddelande i kanalen!
@@ -35,6 +35,7 @@ router.post('/create', async (req, res) => {
     const newChannel = req.body;
     try {
         const result = await createChannel(newChannel);
+        console.log('Kanal skapad:', result);
         res.status(201).json({ createdChannel: result, message: "Channel created " });
     }
     catch (error) {
