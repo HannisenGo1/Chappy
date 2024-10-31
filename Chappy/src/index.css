@@ -95,6 +95,30 @@ p {
   text-align: center;
 }
 
+#chatContainer {
+  display: flex;
+  flex-direction: column; 
+  margin-top: 20px; 
+}
+
+.chat-item {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  background-color: #f0f0f0; 
+}
+
+.sender {
+  background-color: #e0f7fa;
+}
+
+.receiver {
+  background-color: #ffe0b2; 
+}
+
+.chat-item:hover {
+  background-color: #e0e0e0; 
+}
 
 
 button {

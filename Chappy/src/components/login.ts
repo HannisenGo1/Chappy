@@ -5,32 +5,36 @@ const resultattext = document.getElementById('resultattext') as HTMLParagraphEle
 const resultattext2 = document.getElementById('resultattext2') as HTMLParagraphElement | null; // Rätt referens här
 const loginFormContainer = document.getElementById('loginFormContainer') as HTMLDivElement | null;
 const loginButton = document.getElementById('loginbtn') as HTMLButtonElement | null;
-
+let currentUser: string | null = null; 
 let formVisible = false;
 
 interface LoginResponse {
     jwt: string;
     name: string; 
 }
+interface Chat {
+    sender: string;
+    receiver: string;
+    message: string;
+}
+interface LoginData {
+    name: string;
+    password: string;
+}
 
 export const handleLogin = async (): Promise<void> => {
     const username = (document.querySelector('#username') as HTMLInputElement)?.value;
     const password = (document.querySelector('#password') as HTMLInputElement)?.value;
-
+    
     if (!username || !password) {
         if (resultattext) {
             resultattext.innerText = 'Användarnamn och lösenord måste anges';
         }
         return;
     }
-
-    interface LoginData {
-        name: string;
-        password: string;
-    }
-
+    
     const data: LoginData = { name: username, password };
-
+    
     try {
         const response = await fetch('/login', {
             method: 'POST',
@@ -39,28 +43,41 @@ export const handleLogin = async (): Promise<void> => {
             },
             body: JSON.stringify(data)
         });
-
-        console.log('Response status:', response.status); 
+        
+        console.log('Response status:', response.status);
         if (response.status !== 200) {
             if (resultattext) {
                 resultattext.innerText = 'Inloggning misslyckades, försök igen';
             }
             return;
         }
-
+        
         const result: LoginResponse = await response.json();
-
+        currentUser = result.name; 
+        
         if (resultattext2) {
             resultattext2.style.display = 'block'; 
-            resultattext2.innerText = `Välkommen ${result.name}!`;
-        } else {
-            console.error('resultattext2 element not found');
+            resultattext2.innerText = `Välkommen ${currentUser}!`; 
         }
-
+        
         if (loginFormContainer) {
             loginFormContainer.style.display = 'none'; 
         }
-
+        
+        const fetchChatsButton = document.createElement('button');
+        fetchChatsButton.innerText = 'Hämta Chattarna';
+        fetchChatsButton.id = 'fetchChatsButton';
+        
+        
+        fetchChatsButton.addEventListener('click', async () => {
+            await fetchProtectedData(result.jwt);
+        });
+        
+        const buttonContainer = document.getElementById('loginFormContainer'); 
+        if (buttonContainer) {
+            buttonContainer.appendChild(fetchChatsButton);
+        }
+        
         // Kontrollerar behörigheten 
         await fetchProtectedData(result.jwt);
     } catch (error) {
@@ -71,9 +88,11 @@ export const handleLogin = async (): Promise<void> => {
     }
 };
 
+
+
 export const toggleLoginForm = (): void => {
     formVisible = !formVisible;
-
+    
     if (loginFormContainer) {
         loginFormContainer.style.display = formVisible ? 'block' : 'none';
     }
@@ -106,8 +125,27 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
         });
         
         if (response.ok) {
-            const data = await response.json();
+            const data: Chat[] = await response.json();
             console.log('Hämtade chattar:', data);
+            
+            
+            const chatContainer = document.getElementById('chatContainer') as HTMLDivElement | null;
+            if (chatContainer) {
+                chatContainer.innerHTML = ''; 
+                
+                const userChats = data.filter(chat => 
+                    chat.sender === currentUser || chat.receiver === currentUser
+                );
+                
+                userChats.forEach((chat: Chat) => {
+                    const chatElement = document.createElement('div');
+                    chatElement.classList.add('chat-item');
+                    
+                    chatElement.innerText = `${chat.sender} till ${chat.receiver}: ${chat.message}`;
+                    
+                    chatContainer.appendChild(chatElement);
+                });
+            }
         } else {
             console.error('Fel vid hämtning av skyddade data.');
         }
@@ -115,6 +153,7 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
         console.error('Fel vid hämtning av chattar:', error);
     }
 };
+
 
 
 // Fetch user data använder JWT token

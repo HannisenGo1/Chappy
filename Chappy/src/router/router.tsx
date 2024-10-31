@@ -14,7 +14,7 @@ const router = createBrowserRouter([
                 element: <Chats />
             },
             {
-                path: "private-channels", 
+                path: "private", 
                 element: 
                     <ProtectedRoute> <PrivateChannels /></ProtectedRoute>
                 
