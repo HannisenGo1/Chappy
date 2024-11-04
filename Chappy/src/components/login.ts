@@ -1,15 +1,12 @@
 import { useStore } from "../storage/storage";
 import { LoginResponse, Chat, LoginData } from "./interfaces/interfaceLogin";
 
-//const LS_KEY = 'JWT-DEMO--TOKEN';
 const resultattext = document.getElementById('resultattext') as HTMLParagraphElement | null;
-const resultattext2 = document.getElementById('resultattext2') as HTMLParagraphElement | null; // Rätt referens här
+const resultattext2 = document.getElementById('resultattext2') as HTMLParagraphElement | null;
 const loginFormContainer = document.getElementById('loginFormContainer') as HTMLDivElement | null;
 const loginButton = document.getElementById('loginbtn') as HTMLButtonElement | null;
 let currentUser: string | null = null; 
 let formVisible = false;
-
-
 
 export const handleLogin = async (): Promise<void> => {
     const username = (document.querySelector('#username') as HTMLInputElement)?.value;
@@ -33,7 +30,6 @@ export const handleLogin = async (): Promise<void> => {
             body: JSON.stringify(data)
         });
         
-        console.log('Response status:', response.status);
         if (response.status !== 200) {
             if (resultattext) {
                 resultattext.innerText = 'Inloggning misslyckades, försök igen';
@@ -43,9 +39,8 @@ export const handleLogin = async (): Promise<void> => {
         
         const result: LoginResponse = await response.json();
         currentUser = result.name; 
-        // spara JWT token i Zustand store
         useStore.getState().setJwt(result.jwt); 
-        useStore.getState().setIsLoggedIn(true)
+        useStore.getState().setIsLoggedIn(true);
         
         if (resultattext2) {
             resultattext2.style.display = 'block'; 
@@ -55,23 +50,13 @@ export const handleLogin = async (): Promise<void> => {
         if (loginFormContainer) {
             loginFormContainer.style.display = 'none'; 
         }
-        
-        const fetchChatsButton = document.createElement('button');
-        fetchChatsButton.innerText = 'Hämta Chattarna';
-        fetchChatsButton.id = 'fetchChatsButton';
-        
-        
-        fetchChatsButton.addEventListener('click', async () => {
-            await fetchProtectedData(result.jwt);
-        });
-        
-        const buttonContainer = document.getElementById('loginFormContainer'); 
-        if (buttonContainer) {
-            buttonContainer.appendChild(fetchChatsButton);
+        const messageContainer = document.getElementById('messageContainer') as HTMLDivElement | null;
+        if (messageContainer) {
+            messageContainer.style.display = 'block'; 
         }
         
-        // Kontrollerar behörigheten 
-        await fetchProtectedData(result.jwt);
+        await fetchProtectedData(result.jwt); 
+        
     } catch (error) {
         if (resultattext) {
             resultattext.innerText = 'Ett fel uppstod vid inloggningen';
@@ -79,6 +64,7 @@ export const handleLogin = async (): Promise<void> => {
         console.error('Error:', error);
     }
 };
+
 
 export const handleLogout = (): void => {
     useStore.getState().clearJwt(); 
@@ -93,17 +79,7 @@ export const toggleLoginForm = (): void => {
     }
 };
 
-if (loginButton) {
-    loginButton.addEventListener('click', async () => {
-        if (!formVisible) {
-            toggleLoginForm();
-        } else {
-            await handleLogin();
-        }
-    });
-}
-
-// Fetch skyddade data med JWT-token
+//  hämta skyddade data med JWT
 export const fetchProtectedData = async (token: string): Promise<void> => {
     if (!token) {
         console.error('Ingen token hittades, användaren kanske inte är inloggad.');
@@ -122,12 +98,10 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
         if (response.ok) {
             const data: Chat[] = await response.json();
             console.log('Hämtade chattar:', data);
-            
-            
             const chatContainer = document.getElementById('chatContainer') as HTMLDivElement | null;
             if (chatContainer) {
+                chatContainer.style.display = 'block'; 
                 chatContainer.innerHTML = ''; 
-                
                 const userChats = data.filter(chat => 
                     chat.sender === currentUser || chat.receiver === currentUser
                 );
@@ -135,9 +109,7 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
                 userChats.forEach((chat: Chat) => {
                     const chatElement = document.createElement('div');
                     chatElement.classList.add('chat-item');
-                    
                     chatElement.innerText = `${chat.sender} till ${chat.receiver}: ${chat.message}`;
-                    
                     chatContainer.appendChild(chatElement);
                 });
             }
@@ -149,5 +121,122 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
     }
 };
 
+// Användardatan
+export const getUser = async (): Promise<void> => {
+    const token = useStore.getState().jwt;
+    
+    if (!token) {
+        console.error('Ingen token hittades, användaren kanske inte är inloggad.');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/users', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! ${response.status}`);
+        }
+        
+        const userData: { name: string }[] = await response.json();
+        console.log('Svar från servern: ', userData);
+        
+        const userDiv = document.getElementById('userContainer') as HTMLDivElement | null;
+        const receiverSelect = document.getElementById('receiverSelect') as HTMLSelectElement | null;
+        
+        if (!userDiv || !receiverSelect) return;
+        
+        userDiv.innerHTML = '';
+        receiverSelect.innerHTML = ''; 
+        
+        userData.forEach(user => {
+            const userElement = document.createElement('div');
+            userElement.classList.add('userinfo');
+            const userName = document.createElement('h2');
+            userName.innerText = user.name;
+            userElement.appendChild(userName);
+            userDiv.appendChild(userElement);
+            //dropdown
+            const option = document.createElement('option');
+            option.value = user.name; 
+            option.textContent = user.name; 
+            receiverSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+};
 
 
+export const sendMessage = async (receiver: string, message: string) => {
+    const token = useStore.getState().jwt;
+    
+    if (!token) {
+        console.error('Ingen token hittades, användaren kanske inte är inloggad.');
+        return;
+    }
+    const data = {
+        sender: currentUser, 
+        receiver: receiver,   
+        message: message,    
+    };
+    
+    try {
+        const response = await fetch('/api/chats', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! ${response.status}`);
+        }
+        
+        console.log('Meddelandet har skickats.');
+        
+        fetchProtectedData(token);
+    } catch (error) {
+        console.error('Fel vid sändning av meddelande:', error);
+    }
+};
+
+if (loginButton) {
+    loginButton.addEventListener('click', async () => {
+        if (!formVisible) {
+            toggleLoginForm();
+        } else {
+            await handleLogin();
+            await getUser();
+        }
+    });
+}
+
+const sendMessageButton = document.getElementById('sendMessageBtn') as HTMLButtonElement | null;
+
+if (sendMessageButton) {
+    sendMessageButton.addEventListener('click', async () => {
+        const receiverSelect = document.getElementById('receiverSelect') as HTMLSelectElement | null;
+        const messageInput = document.getElementById('messageInput') as HTMLInputElement | null;
+        
+        if (receiverSelect && messageInput) {
+            const receiverId = receiverSelect.value;
+            const message = messageInput.value;
+            
+            if (!receiverId || !message) {
+                console.error('Vänligen välj en mottagare och skriv ett meddelande.');
+                return;
+            }
+            
+            await sendMessage(receiverId, message);
+            messageInput.value = '';
+        }
+    });
+}

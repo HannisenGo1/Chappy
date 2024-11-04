@@ -15,6 +15,7 @@ const router = createBrowserRouter([
                 element: 
                 <ProtectedRoute>
                 <PrivateChannels />
+                
                 </ProtectedRoute>
             },
             {

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import openIcon from '../img/open.png';
 import closedIcon from '../img/closed.png';
-import { SendMessage, Channel, Message } from './interfaces/InterfaceChannel';
+import { SendMessage, Channel, Message, User } from './interfaces/InterfaceChannel';
 import { useStore } from '../storage/storage'; 
 
+
 export const PrivateChannels = () => {
-  const { isLoggedIn } = useStore();
+  const { isLoggedIn, username: storedUsername } = useStore(); 
+  
   const [channels, setChannels] = useState<Channel[]>([]);
   const [openCategories, setOpenCategories] = useState<{ [key: string]: boolean }>({
     'Frontend-utveckling': true,
@@ -15,9 +17,9 @@ export const PrivateChannels = () => {
   });
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [username, setUsername] = useState<string>(''); 
   const [newMessage, setNewMessage] = useState<string>(''); 
-  
+  const [username, setUsername] = useState<string>(storedUsername || ''); 
+
   useEffect(() => {
     const fetchChannels = async () => {
       try {
@@ -62,17 +64,28 @@ export const PrivateChannels = () => {
       setMessage('Ingen kanal tillgänglig i denna kategori');
     }
   };
+
   
+
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedChannel || !username.trim()) {
-      setMessage('Både namn och meddelande måste fyllas i');
+    if (!newMessage.trim() || !selectedChannel) {
+      setMessage('Ett meddelande måste ha innehåll.');
       return;
     }
+    
+    if (!username.trim()) {
+      setMessage('Du måste fylla i ditt namn.');
+      return;
+    }
+    
+    const user: User = {
+      username: username,
+    };
     
     const messagePayload: SendMessage = {
       topic: selectedChannel.topic,
       message: {
-        user: { username },
+        user,
         content: newMessage,
       },
     };
@@ -88,18 +101,19 @@ export const PrivateChannels = () => {
       
       if (response.ok) {
         const addedMessage: Message = {
-          user: { username },
+          user,
           content: newMessage,
         };
         
         setSelectedChannel(prevChannel => {
-          const updatedChannel = prevChannel as Channel; 
+          const updatedChannel = prevChannel as Channel;
           return {
             ...updatedChannel,
             messages: [...updatedChannel.messages, addedMessage],
           };
         });
         setNewMessage('');
+        setUsername(''); 
       } else {
         const errorData = await response.json();
         setMessage(errorData.message || 'Något gick fel vid sändning av meddelande');
@@ -112,48 +126,47 @@ export const PrivateChannels = () => {
   
   return (
     <div id="channelroomContainer">
-    <div>
-    {message && <p style={{ color: 'orange' }}>{message}</p>}
-    {Object.keys(openCategories).map((categoryName) => (
-      <div key={categoryName}>
-      <h2
-      style={{ cursor: 'pointer' }}
-      onClick={() => handleCategoryClick(categoryName)}
-      >
-      {categoryName}
-      <img
-      src={openCategories[categoryName] ? openIcon : closedIcon}
-      alt={openCategories[categoryName] ? 'Öppna kanaler' : 'Stängda kanaler'}
-      style={{ marginLeft: '10px', width: '30px', height: '30px' }}
-      />
-      </h2>
+      <div>
+        {message && <p style={{ color: 'orange' }}>{message}</p>}
+        {Object.keys(openCategories).map((categoryName) => (
+          <div key={categoryName}>
+            <h2
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleCategoryClick(categoryName)}
+            >
+              {categoryName}
+              <img
+                src={openCategories[categoryName] ? openIcon : closedIcon}
+                alt={openCategories[categoryName] ? 'Öppna kanaler' : 'Stängda kanaler'}
+                style={{ marginLeft: '10px', width: '30px', height: '30px' }}
+              />
+            </h2>
+          </div>
+        ))}
       </div>
-    ))}
-    </div>
-    
-    <div>
-    {selectedChannel && (
-      <>
-      <ChannelInfo channel={selectedChannel} />
       
-      <div className="sendMessageForm">
-      <input
-      type="text"
-      value={username}
-      onChange={(e) => setUsername(e.target.value)}
-      placeholder="Ange ditt namn..."
-      />
-      <input
-      type="text"
-      value={newMessage}
-      onChange={(e) => setNewMessage(e.target.value)}
-      placeholder="Skriv ditt meddelande här..."
-      />
-      <button onClick={handleSendMessage}>Skicka</button>
+      <div>
+        {selectedChannel && (
+          <>
+            <ChannelInfo channel={selectedChannel} />
+            <div className="sendMessageForm">
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)} 
+                placeholder="Ange ditt namn..."
+              />
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Skriv ditt meddelande här..."
+              />
+              <button onClick={handleSendMessage}>Skicka</button>
+            </div>
+          </>
+        )}
       </div>
-      </>
-    )}
-    </div>
     </div>
   );
 };
@@ -161,18 +174,17 @@ export const PrivateChannels = () => {
 const ChannelInfo = ({ channel }: { channel: Channel }) => {
   return (
     <div className="channelsinfo">
-    <h3>{channel.name}</h3>
-    <p>{channel.description}</p>
-    <div>
-    {channel.messages.length > 0
-      ? channel.messages.map((message, index) => (
-        <p key={index}>
-        <strong>{message.user.username}:</strong> {message.content}
-        </p>
-      ))
-      : <p>Inga meddelanden</p>}
+      <h3>{channel.name}</h3>
+      <p>{channel.description}</p>
+      <div>
+        {channel.messages.length > 0
+          ? channel.messages.map((message, index) => (
+              <p key={index}>
+                <strong>{message.user.username}:</strong> {message.content}
+              </p>
+            ))
+          : <p>Inga meddelanden</p>}
       </div>
-      </div>
-    );
-  };
-  
+    </div>
+  );
+};

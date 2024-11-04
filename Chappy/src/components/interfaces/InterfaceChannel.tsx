@@ -1,5 +1,6 @@
 export interface User {
     username: string;
+    userId?:string;
   }
   
   export interface Message {
@@ -21,6 +22,7 @@ export interface User {
     message: {
       user: {
         username: string;
+   
       };
       content: string;
     };

@@ -10,6 +10,7 @@
 <body>    <main>
     <header>
         <div class="header"> 
+            <h1> Chappy </h1>
             <button id="loginbtn">Logga in</button>
             <button id="logoutbtn" style="display:none;">Logga ut</button> 
             <button id="signupbtn">Skapa konto</button>
@@ -33,10 +34,20 @@
      
     </div>
       
-        <div id="userContainer"></div>
+      
         <p id="resultattext2" style="display: none;"></p> 
-<h1> Chappy </h1>
-        <div id="chatContainer"></div>
+
+    
+        <div id="messageContainer" style="display: none;">
+            <select id="receiverSelect"></select>
+            <input type="text" id="messageInput" placeholder="Skriv ditt meddelande här" />
+            <button id="sendMessageBtn">Skicka Meddelande</button>
+        </div>
+
+           <div id="chatContainer" style="display: none;"></div>
+
+
+
         <div id="root"></div>
     </main>
     

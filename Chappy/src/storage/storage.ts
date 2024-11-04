@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-// Interface för tillstånden
+// Interface for the store state
 interface StoreState {
   jwt: string | null;
   setJwt: (token: string) => void;
@@ -8,9 +8,11 @@ interface StoreState {
   userId: string | null;
   setUserId: (id: string) => void;
   isLoggedIn: boolean;
-  setIsLoggedIn: (value: boolean) => void; 
+  setIsLoggedIn: (value: boolean) => void;
+  username: string | null;
+  setUsername: (name: string) => void;
+  
 }
-
 
 export const useStore = create<StoreState>((set) => ({
   jwt: localStorage.getItem("jwt") || null,
@@ -23,7 +25,7 @@ export const useStore = create<StoreState>((set) => ({
 
   clearJwt: () => {
     console.log("Clearing JWT");
-    set({ jwt: null, isLoggedIn: false }); 
+    set({ jwt: null, isLoggedIn: false });
     localStorage.removeItem("jwt");
   },
 
@@ -34,11 +36,18 @@ export const useStore = create<StoreState>((set) => ({
     set({ userId: id });
   },
 
-
   isLoggedIn: false,
 
   setIsLoggedIn: (value: boolean) => {
     console.log("Setting isLoggedIn:", value);
     set({ isLoggedIn: value });
+  },
+
+  username: null,
+
+  setUsername: (name: string) => {
+    console.log("Setting Username:", name);
+    set({ username: name });
+    
   },
 }));
