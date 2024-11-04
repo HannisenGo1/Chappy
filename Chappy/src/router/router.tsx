@@ -1,8 +1,9 @@
-import { createBrowserRouter }  from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import Chats from "../components/Chats";
-import PrivateChannels from "../components/PrivateChannels";
+import { PrivateChannels } from "../components/PrivatePage";
+import { PublicChannels } from "../components/channels"; 
 import ProtectedRoute from "./ProtectedRouter";
+
 
 const router = createBrowserRouter([
     {
@@ -10,15 +11,17 @@ const router = createBrowserRouter([
         element: <App />, 
         children: [
             {
-                path: "chats",
-                element: <Chats />
+                path: "/private", 
+                element: 
+                <ProtectedRoute>
+                <PrivateChannels />
+                </ProtectedRoute>
             },
             {
-                path: "private", 
-                element: 
-                    <ProtectedRoute> <PrivateChannels /></ProtectedRoute>
-                
+                path: "/public",  
+                element: <PublicChannels />
             },
+            
         ]
     }
 ]);

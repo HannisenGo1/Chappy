@@ -1,4 +1,5 @@
 import { useStore } from "../storage/storage";
+import { LoginResponse, Chat, LoginData } from "./interfaces/interfaceLogin";
 
 //const LS_KEY = 'JWT-DEMO--TOKEN';
 const resultattext = document.getElementById('resultattext') as HTMLParagraphElement | null;
@@ -8,19 +9,7 @@ const loginButton = document.getElementById('loginbtn') as HTMLButtonElement | n
 let currentUser: string | null = null; 
 let formVisible = false;
 
-interface LoginResponse {
-    jwt: string;
-    name: string; 
-}
-interface Chat {
-    sender: string;
-    receiver: string;
-    message: string;
-}
-interface LoginData {
-    name: string;
-    password: string;
-}
+
 
 export const handleLogin = async (): Promise<void> => {
     const username = (document.querySelector('#username') as HTMLInputElement)?.value;
@@ -54,6 +43,9 @@ export const handleLogin = async (): Promise<void> => {
         
         const result: LoginResponse = await response.json();
         currentUser = result.name; 
+        // spara JWT token i Zustand store
+        useStore.getState().setJwt(result.jwt); 
+        useStore.getState().setIsLoggedIn(true)
         
         if (resultattext2) {
             resultattext2.style.display = 'block'; 
@@ -88,7 +80,10 @@ export const handleLogin = async (): Promise<void> => {
     }
 };
 
-
+export const handleLogout = (): void => {
+    useStore.getState().clearJwt(); 
+    currentUser = null; 
+};
 
 export const toggleLoginForm = (): void => {
     formVisible = !formVisible;
@@ -156,47 +151,3 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
 
 
 
-// Fetch user data använder JWT token
-export const getUser = async (): Promise<void> => {
-    const token = useStore.getState().jwt;
-    
-    if (!token) {
-        console.error('Ingen token hittades, användaren kanske inte är inloggad.');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/users', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! ${response.status}`);
-        }
-        
-        const userData: { name: string }[] = await response.json();
-        console.log('Svar från servern: ', userData);
-        
-        const userDiv = document.getElementById('userContainer') as HTMLDivElement | null;
-        if (!userDiv) return;
-        
-        userDiv.innerHTML = '';
-        
-        userData.forEach(user => {
-            const userElement = document.createElement('div');
-            userElement.classList.add('userinfo');
-            
-            const userName = document.createElement('h2');
-            userName.innerText = user.name;
-            
-            userElement.appendChild(userName);
-            userDiv.appendChild(userElement);
-        });
-    } catch (error) {
-        console.error('Error fetching users:', error);
-    }
-};

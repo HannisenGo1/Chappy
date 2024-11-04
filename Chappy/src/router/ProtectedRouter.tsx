@@ -1,22 +1,23 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStorelog } from '../storage/storage';
+import { useStore } from '../storage/storage';
 
 interface Protected {
     children: any; 
 }
 
 const ProtectedRoute = ({ children }: Protected) => {
-    const isLoggedIn = useStorelog(state => state.isLoggedIn);
+    const isLoggedIn = useStore(state => state.isLoggedIn);
+    const token = useStore(state => state.jwt); 
     const navigate = useNavigate();
-
+    
     useEffect(() => {
-        if (!isLoggedIn) {
-            navigate('/');
+        if (!isLoggedIn || !token) {
+            navigate('/public'); 
         }
-    }, [isLoggedIn, navigate]);
-
-    return isLoggedIn ? <>{children}</> : null; 
+    }, [isLoggedIn, token, navigate]);
+    
+    return (isLoggedIn && token) ? <>{children}</> : null; 
 };
 
 export default ProtectedRoute;

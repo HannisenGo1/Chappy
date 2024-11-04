@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import openIcon from '../img/open.png';
 import closedIcon from '../img/closed.png';
-import {  SendMessage,Channel,Message   } from './interfaces/InterfaceChannel';
+import { SendMessage, Channel, Message } from './interfaces/InterfaceChannel';
+import { useStore } from '../storage/storage'; 
 
-
-
-export const PublicChannels = () => {
+export const PrivateChannels = () => {
+  const { isLoggedIn } = useStore();
   const [channels, setChannels] = useState<Channel[]>([]);
-  const [openCategories] = useState<{ [key: string]: boolean }>({
+  const [openCategories, setOpenCategories] = useState<{ [key: string]: boolean }>({
     'Frontend-utveckling': true,
     'Backend-utveckling': false,
     'Allmän diskussion': true,
@@ -17,9 +17,6 @@ export const PublicChannels = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [username, setUsername] = useState<string>(''); 
   const [newMessage, setNewMessage] = useState<string>(''); 
-  
-  
-  
   
   useEffect(() => {
     const fetchChannels = async () => {
@@ -39,6 +36,17 @@ export const PublicChannels = () => {
     
     fetchChannels();
   }, []);
+  
+  useEffect(() => {
+    if (isLoggedIn) {
+      setOpenCategories({
+        'Frontend-utveckling': true,
+        'Backend-utveckling': true,
+        'Allmän diskussion': true,
+        'Nyhetsdiskussioner': true,
+      });
+    }
+  }, [isLoggedIn]); 
   
   const handleCategoryClick = (categoryName: string) => {
     if (!openCategories[categoryName]) {
