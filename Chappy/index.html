@@ -13,10 +13,14 @@
             <h1> Chappy </h1>
             <button id="loginbtn">Logga in</button>
             <button id="logoutbtn" style="display:none;">Logga ut</button> 
-            <button id="signupbtn">Skapa konto</button>
+            <CreateUser/>
             <button id="deleteAccountBtn" style="display:none;">Radera konto</button> 
         </div>
+    
     </header>
+   
+
+
     <div id="loginFormContainer">
         <h2>Logga in</h2>
         
@@ -34,8 +38,10 @@
      
     </div>
       
-      
-        <p id="resultattext2" style="display: none;"></p> 
+      <div id ="welcometextdiv">
+         <p id="resultattext2" style="display: none;"></p> 
+    </div>
+       
 
     
         <div id="messageContainer" style="display: none;">
@@ -44,7 +50,7 @@
             <button id="sendMessageBtn">Skicka Meddelande</button>
         </div>
 
-           <div id="chatContainer" style="display: none;"></div>
+           <div id="chatContainer"></div>
 
 
 

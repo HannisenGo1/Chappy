@@ -1,23 +1,16 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useStore } from '../storage/storage';
+import { Navigate } from "react-router-dom";
+import { useStore } from "../storage/storage";
 
-interface Protected {
-    children: any; 
-}
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const { isLoggedIn } = useStore();
 
-const ProtectedRoute = ({ children }: Protected) => {
-    const isLoggedIn = useStore(state => state.isLoggedIn);
-    const token = useStore(state => state.jwt); 
-    const navigate = useNavigate();
-    
-    useEffect(() => {
-        if (!isLoggedIn || !token) {
-            navigate('/public'); 
-        }
-    }, [isLoggedIn, token, navigate]);
-    
-    return (isLoggedIn && token) ? <>{children}</> : null; 
+  if (!isLoggedIn) {
+   
+    return <Navigate to="/public" />;
+  }
+
+  
+  return children;
 };
 
 export default ProtectedRoute;

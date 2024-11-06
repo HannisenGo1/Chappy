@@ -34,6 +34,9 @@ router.post('/create', async (req: Request, res: Response) => {
 });
 
 
+
+
+
 // Ta bort en användare
 router.delete('/:id', async (req: Request, res: Response) => {
     const userId = req.params.id;

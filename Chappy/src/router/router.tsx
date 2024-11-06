@@ -3,6 +3,7 @@ import App from "../App";
 import { PrivateChannels } from "../components/PrivatePage";
 import { PublicChannels } from "../components/channels"; 
 import ProtectedRoute from "./ProtectedRouter";
+import {CreateUser} from "../components/credelUser";
 
 
 const router = createBrowserRouter([
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
             {
                 path: "/public",  
                 element: <PublicChannels />
+            },
+            {
+                path: "/create-user",
+                 element: <CreateUser />
             },
             
         ]

@@ -5,8 +5,10 @@ const resultattext = document.getElementById('resultattext') as HTMLParagraphEle
 const resultattext2 = document.getElementById('resultattext2') as HTMLParagraphElement | null;
 const loginFormContainer = document.getElementById('loginFormContainer') as HTMLDivElement | null;
 const loginButton = document.getElementById('loginbtn') as HTMLButtonElement | null;
+
 let currentUser: string | null = null; 
 let formVisible = false;
+
 
 export const handleLogin = async (): Promise<void> => {
     const username = (document.querySelector('#username') as HTMLInputElement)?.value;
@@ -54,6 +56,9 @@ export const handleLogin = async (): Promise<void> => {
         if (messageContainer) {
             messageContainer.style.display = 'block'; 
         }
+        if (loginButton) {
+            loginButton.innerText = 'Logga ut'; 
+        }
         
         await fetchProtectedData(result.jwt); 
         
@@ -69,7 +74,8 @@ export const handleLogin = async (): Promise<void> => {
 export const handleLogout = (): void => {
     useStore.getState().clearJwt(); 
     currentUser = null; 
-};
+    useStore.getState().setIsLoggedIn(false);
+}
 
 export const toggleLoginForm = (): void => {
     formVisible = !formVisible;
@@ -100,7 +106,7 @@ export const fetchProtectedData = async (token: string): Promise<void> => {
             console.log('Hämtade chattar:', data);
             const chatContainer = document.getElementById('chatContainer') as HTMLDivElement | null;
             if (chatContainer) {
-                chatContainer.style.display = 'block'; 
+                
                 chatContainer.innerHTML = ''; 
                 const userChats = data.filter(chat => 
                     chat.sender === currentUser || chat.receiver === currentUser
@@ -155,12 +161,7 @@ export const getUser = async (): Promise<void> => {
         receiverSelect.innerHTML = ''; 
         
         userData.forEach(user => {
-            const userElement = document.createElement('div');
-            userElement.classList.add('userinfo');
-            const userName = document.createElement('h2');
-            userName.innerText = user.name;
-            userElement.appendChild(userName);
-            userDiv.appendChild(userElement);
+           
             //dropdown
             const option = document.createElement('option');
             option.value = user.name; 

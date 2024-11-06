@@ -1,50 +1,87 @@
-# React + TypeScript + Vite
+http://localhost:5000
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Användning av Api
 
-Currently, two official plugins are available:
+/api/users
+      [Method-Get] - Få ut användare.
+      const response = await fetch('/api/users', {
+                  method: 'GET',
+                  headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                  }
+              });
+      [Method-Post]  - Skapa en användare.
+      const response = await fetch('/api/users/create', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({ name, password }),
+                  });
+                  const result = await response.json();
+# Interface för users    
+{
+    "name": string;
+    "password": string;
+} 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# API Chats
+/api/chats
+      [Method-Get]
+      const response = fetch('/api/chats', {
+                  method: 'GET',
+                  headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'Content-Type': 'application/json'
+                    }
+                  })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Fel vid hämtning av chattar:', error));
 
-## Expanding the ESLint configuration
+      [Method-Post]
+      const response = await fetch('/api/chats', {
+                      method: 'POST',
+                      headers: {
+                        'Authorization': `Bearer ${Token}`,
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify(data)
+                    })
+# Interfaces för chats: 
+const data = {
+  sender: string;
+  receiver: string;
+  message: string;
+};
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+/kanaler
+        [Method-Get]
+        const response = await fetch('/kanaler');
+        [Post/kanaler]{
+          topic: 'Frontend-utveckling',
+          message: {
+            user: { username: 'Gäst' },
+            content: 'Det här är ett testmeddelande'
+          }
+        }
+# Interface för kanaler & skriva meddelande
+interface Channel {
+    name: string;
+    description: string;
+    topic: string;
+    users: User[];
+    isOpen: boolean; 
+    messages: Message[]; 
+}
+interface SendMessage {
+    topic: string;
+    message: {
+        user: {
+            username: string;
+        };
+        content: string;
+    };
+}
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
