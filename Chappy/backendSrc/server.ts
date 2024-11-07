@@ -26,7 +26,7 @@ app.use('/', (req: Request, _, next: NextFunction) => {
     next();
 });
 
-app.use('/', express.static('./src')); 
+app.use('/', express.static('./dist')); 
 
 
 // Routes! 
