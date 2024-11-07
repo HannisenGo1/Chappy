@@ -17,7 +17,7 @@ app.use('/', express.static('./src'));
 // Routes! 
 app.use('/api/chats', chatRouter);
 app.use('/api/users', userRouter);
-app.use('/kanaler', kanalRouter);
+app.use('/api/kanaler', kanalRouter);
 // Inloggning
 app.post('/login', async (req, res) => {
     if (!process.env.SECRET) {

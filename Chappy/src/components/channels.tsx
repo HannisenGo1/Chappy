@@ -24,7 +24,7 @@ export const PublicChannels = () => {
   useEffect(() => {
     const fetchChannels = async () => {
       try {
-        const response = await fetch('/kanaler');
+        const response = await fetch('/api/kanaler');
         if (!response.ok) {
           throw new Error(`HTTP error! ${response.status}`);
         }
@@ -70,7 +70,7 @@ export const PublicChannels = () => {
     };
     
     try {
-      const response = await fetch('/kanaler', {
+      const response = await fetch('/api/kanaler', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
