@@ -26,7 +26,7 @@ import { MongoClient, Collection, WithId, Db,
         return result
     }
     
-    // Få ut användare baserat på namn, använder i validateLogin för inloggningen.
+    // Få ut användare baserat på namn.
     async function getUserByname(name: string): Promise<WithId<user> | null> {
         const [col, client]: [Collection<user>, MongoClient] = await connect();
         
