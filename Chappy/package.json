@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build-frontend": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "build-frontend": "tsc -b && vite build",
     "backend": "tsc --project tsconfig.backend.json && node --env-file .env ./backendDist/server.js",
     "build-backend": "tsc --project tsconfig.backend.json",
-    "start-backend": "node --env-file .env ./backendDist/server.js"
+    "start-backend": "node --env-file .env ./backendDist/server.js",
+    "build": "npm run build-frontend && npm run build-backend"
   },
   "dependencies": {
     "@types/cors": "^2.8.17",
