@@ -104,6 +104,8 @@ form{
 label {
   color: white;
   margin: 0.4em;
+  
+ 
 }
 ul{
   color:white;
@@ -122,6 +124,7 @@ ul{
 }
 .sendMessageForm{
   display:flex;
+  margin-top: 1em;
 }
 
 h1 {
@@ -164,8 +167,28 @@ h2, h3,p {
   justify-content: center; 
   margin: 0 auto; 
   gap: 10px; 
+  max-height: 25em; 
+  overflow-y: auto;
+  scrollbar-width: thin; 
+  scrollbar-color: #C383FF #70256b;
+  padding-right: 10px;
+} 
+
+#chatContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px; 
 }
 
+#chatContainer::-webkit-scrollbar-thumb {
+  background-color: #888; 
+  border-radius: 4px; 
+  border: 2px solid #f1f1f1; 
+}
+
+
+#chatContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #555; 
+}
 .chat-item {
   padding: 10px; 
   margin: 5px 0; 
@@ -223,9 +246,13 @@ h2, h3,p {
   border-radius: 8px; 
   padding: 10px; 
   margin-top: 30px; 
-
+  width:25.6em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
   background-color: #2c2c2c; 
+  max-height: 25em; 
+  overflow-y: auto;
+  scrollbar-width: thin; 
+  scrollbar-color: #C383FF #70256b;
 }
 #messageContainer {
   display: flex;

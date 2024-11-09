@@ -57,7 +57,7 @@ export const handleLogin = async (): Promise<void> => {
             messageContainer.style.display = 'block'; 
         }
         if (loginButton) {
-            loginButton.innerText = 'Logga ut'; 
+            loginButton.style.display = 'none';  
         }
         
         await fetchProtectedData(result.jwt); 
