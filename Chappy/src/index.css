@@ -43,7 +43,7 @@ h1 {
 }
 
 footer {
-  background-color: #C383FF;
+  color:black;
   text-align: center;
   padding: 10px; 
   margin-top: auto; 
@@ -57,7 +57,7 @@ button {
   background-color: #C383FF;
   border: 2px solid black;
   border-radius: 5px;
-  color: white;
+
   transition: background-color 0.3s; 
 }
 
@@ -85,7 +85,10 @@ form{
 }
 
 #loginbtn:active, #logoutbtn:active {
-  background-color: blue;
+  background-color: blueviolet;
+}
+#loginbtn:hover {
+  background-color: blueviolet;
 }
 
 #signupbtn {
@@ -284,6 +287,6 @@ h2 :active{
 }
 footer {
   text-align: center;
-  background-color: #C383FF;
+  
   margin-top: 13em;
 }
